@@ -94,8 +94,8 @@ def main():
     prec_no = st.text_input('▼観測所の都道府県番号（prec_no）：例）82')
     block_no = st.text_input('▼観測所のブロック番号（block_no）：例）0788')
 
-    start_year_multi = st.text_input('開始年')
-    end_year_multi = st.text_input('終了年')
+    start_year_multi = st.text_input('開始年：例）2010')
+    end_year_multi = st.text_input('終了年：例）2011')
     submit_btn_multi = st.button('▼取得開始')
 
     if submit_btn_multi:
