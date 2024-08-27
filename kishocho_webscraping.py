@@ -68,7 +68,7 @@ class RainDataExtractor:
                         self.date_arr.append(current_datetime.strftime('%Y-%m-%d %H:%M'))
                         current_datetime += timedelta(hours=1)
 
-                    time.sleep(1)
+                    time.sleep(0.5)
 
         # データフレームの作成
         return self.createdf('rain').to_csv(index=False).encode('shift_jis')
