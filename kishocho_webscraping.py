@@ -44,7 +44,7 @@ class RainDataExtractor:
             end_datetime = datetime(year, 12, 31, 23, 59)
             current_datetime = start_datetime
          
-            for month in range(1,2):
+            for month in range(1,13):
                 end_day = calendar.monthrange(year,month)[1] + 1
          
                 for day in range(1,end_day):
@@ -68,7 +68,7 @@ class RainDataExtractor:
                         self.date_arr.append(current_datetime.strftime('%Y-%m-%d %H:%M'))
                         current_datetime += timedelta(hours=1)
 
-            time.sleep(1)
+                    time.sleep(1)
 
         # データフレームの作成
         return self.createdf('rain').to_csv(index=False).encode('shift_jis')
