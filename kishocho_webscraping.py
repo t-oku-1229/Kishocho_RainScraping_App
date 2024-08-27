@@ -4,6 +4,7 @@ import streamlit as st
 import os
 from bs4 import BeautifulSoup
 import requests
+from requests.exceptions import Timeout
 import time
 import calendar
 
@@ -48,27 +49,31 @@ class RainDataExtractor:
                 end_day = calendar.monthrange(year,month)[1] + 1
          
                 for day in range(1,end_day):
+                    time.sleep(0.5)
                     url = 'https://www.data.jma.go.jp/obd/stats/etrn/view/hourly_a1.php?prec_no=' + str(self.prec_no) + '&block_no=' + str(self.block_no) + "&year=" + str(year) + '&month=' + str(month) + '&day=' + str(day) + '&view='
 
-                    res = requests.get(url)
-                    soup = BeautifulSoup(res.text,"html.parser")
-                    _rain = soup.find_all('tr', class_ = 'mtx', style = 'text-align:right;')
+                    try:
+                        res = requests.get(url　, timeout=5)
+                        soup = BeautifulSoup(res.text,"html.parser")
+                        _rain = soup.find_all('tr', class_ = 'mtx', style = 'text-align:right;')
+    
+                        st.session_state.datetime_container.write(str(year) + '年' + str(month) + '月' + str(day) + '日 のデータを取得中')
+    
+                        for hour in range(0,24):
+                            flag = False
+                            hour_value = _rain[hour]
+                            data = hour_value.find_all('td', class_ = 'data_0_0')
+                            rain_html = str(data[0])
+                            rain = rain_html.replace('<td class="data_0_0">','').replace('</td>','')
+                            if rain == '--':
+                                rain = 0.0
+                            self.hourly_rain.append(rain)
+                            self.date_arr.append(current_datetime.strftime('%Y-%m-%d %H:%M'))
+                            current_datetime += timedelta(hours=1)
 
-                    st.session_state.datetime_container.write(str(year) + '年' + str(month) + '月' + str(day) + '日 のデータを取得中')
-
-                    for hour in range(0,24):
-                        flag = False
-                        hour_value = _rain[hour]
-                        data = hour_value.find_all('td', class_ = 'data_0_0')
-                        rain_html = str(data[0])
-                        rain = rain_html.replace('<td class="data_0_0">','').replace('</td>','')
-                        if rain == '--':
-                            rain = 0.0
-                        self.hourly_rain.append(rain)
-                        self.date_arr.append(current_datetime.strftime('%Y-%m-%d %H:%M'))
-                        current_datetime += timedelta(hours=1)
-
-                    time.sleep(0.5)
+                    except Timeout:
+                        st.write('セッションがタイムアウトしました。取得済みの雨量のみでCSVを作成します。')
+                        pass
 
         # データフレームの作成
         return self.createdf('rain').to_csv(index=False).encode('shift_jis')
