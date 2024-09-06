@@ -53,7 +53,7 @@ class RainDataExtractor:
                     url = 'https://www.data.jma.go.jp/obd/stats/etrn/view/hourly_a1.php?prec_no=' + str(self.prec_no) + '&block_no=' + str(self.block_no) + "&year=" + str(year) + '&month=' + str(month) + '&day=' + str(day) + '&view='
 
                     try:
-                        res = requests.get(url　, timeout=5)
+                        res = requests.get(url, timeout=5)
                         soup = BeautifulSoup(res.text,"html.parser")
                         _rain = soup.find_all('tr', class_ = 'mtx', style = 'text-align:right;')
     
